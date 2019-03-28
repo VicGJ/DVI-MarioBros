@@ -356,15 +356,25 @@ var game = function() {
 ///////////////////////////////////CARGA NIVELES////////////////////////////////////////////////////
 
 	//INICIALIZACION
-	Q.loadTMX("prueba.tmx", function() {
+	Q.loadTMX("prueba2.tmx", function() {
 		Q.stageScene("mainTitle");
 	});
+
+	/*Q.loadTMX("prueba.tmx", function() {
+		Q.stageScene("mainTitle");
+	});
+
+	Q.loadTMX("level.tmx", function() {
+		Q.stageScene("mainTitle");
+	});*/
+
+
 
 
 	//NIVEL 1
 	Q.scene("level1", function(stage) {
 
-		Q.stageTMX("prueba.tmx",stage);
+		Q.stageTMX("prueba2.tmx",stage);
 
 		Q.audio.play('metal_main.mp3',{ loop: true });
 		var player = stage.insert(new Q.Mario({x: 150,y: 380,}));
@@ -390,13 +400,12 @@ var game = function() {
 
 	//TITULO DEL JUEGO
 	Q.scene("mainTitle", function(stage){
-		
+
 		var button = new Q.UI.Button({
 			x: Q.width/2, 
 			y: Q.height/2,
-			asset: "mainTitle.png"
-
-		})
+			asset:"mainTitle.png"
+		});
 		stage.insert(button);
 		button.on("click",function() {
 			Q.clearStages();
@@ -404,6 +413,7 @@ var game = function() {
 			Q.stageScene("level1");
 			Q.stageScene("hud", 3);
 		});
+
 	});
 
 	//GAME OVER
