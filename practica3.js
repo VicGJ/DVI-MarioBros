@@ -17,8 +17,6 @@ var game = function() {
 		}).include("Sprites, Scenes, Input, 2D, Audio, Anim, Touch, UI, TMX").setup({
 			width: 320, // Set the default width to 800 pixels
 			height: 480, // Set the default height to 600 pixels
-		//	downsampleWidth: 640, // Halve the pixel density if resolution
-		//	downsampleHeight: 960 // is larger than or equal to 1024x768
 		}).controls().touch().enableSound();
 
 	
@@ -26,13 +24,14 @@ var game = function() {
 ///////////////////////////////sprites//////////////////////////////////////////////	
 	
 	//CARGA DE DATOS
-
 	Q.load(["mario_small.png", "mario_small.json",
 			"mainTitle.png", "goomba.png", "goomba.json",
 			"princess.png", "bloopa.png", "bloopa.json",
 			"coin.png", "coin.json"], function() {
 
 		Q.compileSheets("mario_small.png","mario_small.json");
+		//Q.compileSheets("bowser.png","bowser_small.json");
+		//Q.compileSheets("megaman.png", "megaman.json");
 		Q.compileSheets("goomba.png", "goomba.json");
 		Q.compileSheets("bloopa.png", "bloopa.json");
 		Q.compileSheets("coin.png", "coin.json");
@@ -47,7 +46,6 @@ var game = function() {
 		init: function(p) {
 
 		 	this.alive = true;
-		 	this.oneUp = true;
 		 	this.lastMileStone = 1;
 		    this._super(p, {
 		      	
@@ -65,7 +63,7 @@ var game = function() {
 		    this.on("hit.sprite",function(collision) {
 				if(collision.obj.isA("Peach")) {
 					Q.audio.play("music_level_complete.mp3");
-					Q.stageScene("endGame",1, { label: "You Won!" });
+					Q.stageScene("endGame",1, { label: "You Win!" });
 					this.destroy();
 				}
 			});
@@ -77,7 +75,8 @@ var game = function() {
 		Die: function(){
 			if(this.alive){
 				this.alive = false;
-				Q.audio.play("music_die.mp3");
+				Q.audio.stop();
+				Q.audio.play("mario-bros-mamma-mia.mp3");
 				this.gravity = 0;
 				this.stage.unfollow();
 				this.play("die");
@@ -111,30 +110,16 @@ var game = function() {
 			if(this.alive){
 				this.destroy();
 				Q.state.dec("lives", 1);
-				Q.audio.play("music_die.mp3");
+				Q.audio.stop();
+				Q.audio.play("mario-bros-mamma-mia.mp3");
 				Q.stageScene("endGame",1, { label: "You Died" });
 			}
-		},
-
-		extralife: function(){
-
-			Q.state.inc("lives", 1);
-			Q.audio.play("1up.mp3");
 		},
 
 		step: function(dt) {
 		  	
 		  	if(this.p.y > 520)
 		  		this.stage.follow(Q("Mario").first(), {x: true, y: false});
-		  	if(this.oneUp && Q.state.get("score") / 1000 == this.lastMileStone){
-
-		  		this.extralife();
-		  		this.oneUp = false;
-		  	}
-		  	else if(!this.oneUp){
-		  		this.lastMileStone++;
-		  		this.oneUp = true;
-		  	}
 
 		  	if(this.p.y > 620){
 		  		this.fall();
@@ -155,14 +140,6 @@ var game = function() {
 		    }
 					
 		}
-/*
-		stomp: function(collision) {
-			if(collision.obj.isA(["bloopa"])) {
-			collision.obj.destroy();
-			this.p.vy = -500; // make the player jump
-			}
-		}
-*/
 	
 	});
 
@@ -216,38 +193,7 @@ var game = function() {
 	
 	});
 	
-	//SPRITE ONEUP
-	Q.Sprite.extend("OneUp",{
 
-	 
-		init: function(p) {
-
-			this.taken = false;
-		 
-		    this._super(p, {
-		    	asset: "1up_mushroom.png",
-		    	x: 2000,
-		    	y: 430,
-		    	vx: 100,
-		    	sensor: true
-		    });
-
-		    this.on("hit.sprite",function(collision) {
-
-
-				if(collision.obj.isA("Mario")) {
-					if(!this.taken){
-						this.taken = true;
-						collision.obj.extralife();
-						this.destroy();
-					}
-				}
-			});
-
-		}
-
-	
-	});
 	//SPRITE BLOOPA
 	Q.Sprite.extend("Bloopa",{
 
@@ -344,7 +290,7 @@ var game = function() {
 		extend: {
 			DEAD: function() {
 				if(this.alive){
-					Q.audio.play("squish_enemy.mp3");
+					Q.audio.play("kill_enemy.mp3");
 					this.alive = false;
 					Q.state.inc("score", 100);
 					this.play("die");
@@ -362,15 +308,23 @@ var game = function() {
 	
 
 ////////////////////////////////////ANIMACIONES/////////////////////////////////////////////////////
-	
 	//Animaciones Mario
 	Q.animations('Mario_anim', {
 		run_right: { frames: [1,2,3], rate: 1/10}, 
 		run_left: { frames: [17,16,15], rate:1/10 },
-//		fire_right: { frames: [9,10,10], next: 'stand_right', rate: 1/30, trigger: "fired" },
-//		fire_left: { frames: [20,21,21], next: 'stand_left', rate: 1/30, trigger: "fired" },
 		Stand_right: { frames: [0]},
 		Stand_left: { frames: [14] },
+		fall_right: { frames: [4], loop: false },
+		fall_left: { frames: [18], loop: false },
+		die: {frames: [12], loop: true}
+	});
+
+	//Animaciones Bowser
+	Q.animations('Bowser_anim', {
+		run_right: { frames: [1, 2, 3, 4, 5], rate: 1/10}, 
+		run_left: { frames: [10, 9, 8, 7, 6], rate: 1/10 },
+		Stand_right: { frames: [0]},
+		Stand_left: { frames: [11] },
 		fall_right: { frames: [4], loop: false },
 		fall_left: { frames: [18], loop: false },
 		die: {frames: [12], loop: true}
@@ -395,30 +349,29 @@ var game = function() {
 
 ///////////////////////////////////AUDIOS///////////////////////////////////////////////////////////
 	//CARGA DE AUDIOS
-	Q.load(["music_die.mp3", "music_level_complete.mp3", "music_main.mp3", "coin.mp3"], function(){
+	Q.load(["music_die.mp3", "music_level_complete.mp3", "music_main.mp3",
+	 "coin.mp3", "mario-bros-mamma-mia.mp3", "squish_enemy.mp3", "kill_enemy.mp3", "metal_main.mp3"], function(){
 
 	});
 ///////////////////////////////////CARGA NIVELES////////////////////////////////////////////////////
 
 	//INICIALIZACION
-	Q.loadTMX("level.tmx", function() {
+	Q.loadTMX("prueba.tmx", function() {
 		Q.stageScene("mainTitle");
-		//Q.stageScene("level1");
 	});
 
 
 	//NIVEL 1
 	Q.scene("level1", function(stage) {
 
-		Q.stageTMX("level.tmx",stage);
+		Q.stageTMX("prueba.tmx",stage);
 
-		Q.audio.play('music_main.mp3',{ loop: true });
+		Q.audio.play('metal_main.mp3',{ loop: true });
 		var player = stage.insert(new Q.Mario({x: 150,y: 380,}));
 		stage.insert(new Q.Goomba({x: 1500,y: 450}));
 		stage.insert(new Q.Goomba({x: 1450,y: 450}));
 		stage.insert(new Q.Goomba({x: 600,y: 450}));
 		stage.insert(new Q.Goomba({x: 850,y: 450}));
-		stage.insert(new Q.OneUp({x: 26,y: 528}));
 		stage.insert(new Q.Peach({x: 2000,y: 450}));
 		stage.insert(new Q.Bloopa({x:700,y:420}));
 		stage.insert(new Q.Bloopa({x:1300,y:45}));
@@ -433,8 +386,6 @@ var game = function() {
 		stage.add("viewport").follow(Q("Mario").first());
 		stage.viewport.offsetX = -100;
 		stage.viewport.offsetY = 160;
-
-
 	});
 
 	//TITULO DEL JUEGO
@@ -453,14 +404,12 @@ var game = function() {
 			Q.stageScene("level1");
 			Q.stageScene("hud", 3);
 		});
-
-
 	});
 
 	//GAME OVER
 	Q.scene('endGame',function(stage) {
 
-		Q.audio.stop("music_main.mp3");	
+		Q.audio.stop("metal_main.mp3");	
 		var container = stage.insert(new Q.UI.Container({
 		
 			x: Q.width/2, 
@@ -561,82 +510,4 @@ var game = function() {
             this.p.label = "LIVES: " + Q.state.get("lives");
         }
     });
-
-
-////////////////////////////////BUCLE PRINCIPAL//////////////////////////////////////////////
-
-/*
-Preguntar:
-
--por animaciones de los enemigos al morir
--por el callback de coin
-
-*/
-
 }
-
-
-
-///////////////////////////////////Cajon de basura///////////////////////////////////////////////////
-/*
-.follow(Q("Mario").first())
-.centerOn(150,380);
-	Q.scene("level1",function(stage) {          
-	    var background = new Q.TileLayer({ dataAsset: 'level1.tmx', layerIndex: 0, sheet: 'tiles', tileW: 70, tileH: 70, type: Q.SPRITE_NONE });
-	    stage.insert(background);   
-	    stage.collisionLayer(new Q.TileLayer({ dataAsset: 'level1.tmx', layerIndex:1,  sheet: 'tiles', tileW: 70, tileH: 70 }));      
-	});
-*/
-
-/*
-	// Make sure penguin.png is loaded
-	Q.load(["images/mario_small.png", "data/mario_small.json"],function() {
-
-		Q.compileSheets("images/mario_small.png", "data/mario_small.json");
-	/*	var Mario = new Q.Mario();
-		Q.gameLoop(function(dt) {
-			Q.clear();
-			Mario.update(dt);
-			Mario.render(Q.ctx);
-			});
-	});
-	*/
-
-
-	/*
-	Q.Sprite.extend("Player",{
-	  init: function(p) {
-	    this._super(p, {
-	        hitPoints: 10,
-	        damage: 5,
-	        x: 5,
-	        y: 1
-  		});
-	}); 
-	*/
-
-/*
-	    this.on("hit.sprite",function(collision) {
-
-	      if(collision.obj.isA("Tower")) {
-	        Q.stageScene("endGame",1, { label: "You Won!" }); 
-	        this.destroy();
-	      }
-	    });
-*/
-
-/*
-	Q.load(["mario_small.png", "mario_small.json"],function() {
-
-		Q.compileSheets("mario_small.png", "mario_small.json");
-		var Mario = new Q.Player();
-		Q.gameLoop(function(dt) {
-			Q.clear();
-			Mario.update(dt);
-			Mario.render(Q.ctx);
-			});
-	});
-
-
-	follow(Q("Mario").first())
-*/
