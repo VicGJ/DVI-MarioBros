@@ -356,7 +356,7 @@ var game = function() {
 ///////////////////////////////////CARGA NIVELES////////////////////////////////////////////////////
 
 	//INICIALIZACION
-	Q.loadTMX("prueba2.tmx", function() {
+	Q.loadTMX("prueba3.tmx", function() {
 		Q.stageScene("mainTitle");
 	});
 
@@ -374,25 +374,25 @@ var game = function() {
 	//NIVEL 1
 	Q.scene("level1", function(stage) {
 
-		Q.stageTMX("prueba2.tmx",stage);
+		Q.stageTMX("prueba3.tmx",stage);
 
 		Q.audio.play('metal_main.mp3',{ loop: true });
 		var player = stage.insert(new Q.Mario({x: 150,y: 380,}));
-		stage.insert(new Q.Goomba({x: 1500,y: 450}));
-		stage.insert(new Q.Goomba({x: 1450,y: 450}));
-		stage.insert(new Q.Goomba({x: 600,y: 450}));
-		stage.insert(new Q.Goomba({x: 850,y: 450}));
-		stage.insert(new Q.Peach({x: 2000,y: 450}));
-		stage.insert(new Q.Bloopa({x:700,y:420}));
-		stage.insert(new Q.Bloopa({x:1300,y:45}));
-		stage.insert(new Q.Bloopa({x:600,y:420}));
-		stage.insert(new Q.Bloopa({x:800,y:420}));
-		stage.insert(new Q.Coin({x:400,y:420}));
+		/*stage.insert(new Q.Coin({x:400,y:420}));
 		stage.insert(new Q.Coin({x:430,y:420}));
 		stage.insert(new Q.Coin({x:460,y:420}));
 		stage.insert(new Q.Coin({x:500,y:420}));
+		stage.insert(new Q.Bloopa({x:595,y:420}));
+		stage.insert(new Q.Goomba({x: 600,y: 450}));
+		stage.insert(new Q.Goomba({x: 850,y: 450}));
+		stage.insert(new Q.Bloopa({x:1000,y:420}));
+		stage.insert(new Q.Bloopa({x:1160,y:420}));
+		stage.insert(new Q.Bloopa({x:1300,y:45}));
+		stage.insert(new Q.Goomba({x: 1450,y: 450}));
+		stage.insert(new Q.Goomba({x: 1500,y: 450}));
 		stage.insert(new Q.Coin({x:1500,y:480}));
-		stage.insert(new Q.Coin({x:1530,y:480}));
+		stage.insert(new Q.Coin({x:1530,y:480}));*/
+		stage.insert(new Q.Peach({x: 4950,y: 350}));
 		stage.add("viewport").follow(Q("Mario").first());
 		stage.viewport.offsetX = -100;
 		stage.viewport.offsetY = 160;
