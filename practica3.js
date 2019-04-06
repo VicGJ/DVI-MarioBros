@@ -27,11 +27,9 @@ var game = function() {
 	Q.load(["mario_small.png", "mario_small.json",
 			"mainTitle.png", "goomba.png", "goomba.json",
 			"princess.png", "bloopa.png", "bloopa.json",
-			"coin.png", "coin.json"], function() {
+			"coin.png", "coin.json", "1up_mushroom.png"], function() {
 
 		Q.compileSheets("mario_small.png","mario_small.json");
-		//Q.compileSheets("bowser.png","bowser_small.json");
-		//Q.compileSheets("megaman.png", "megaman.json");
 		Q.compileSheets("goomba.png", "goomba.json");
 		Q.compileSheets("bloopa.png", "bloopa.json");
 		Q.compileSheets("coin.png", "coin.json");
@@ -47,6 +45,7 @@ var game = function() {
 
 		 	this.alive = true;
 		 	this.lastMileStone = 1;
+		 	this.oneUp = true;
 		    this._super(p, {
 		      	
 		      	sheet: "marioR",
@@ -121,6 +120,16 @@ var game = function() {
 		  	if(this.p.y > 520)
 		  		this.stage.follow(Q("Mario").first(), {x: true, y: false});
 
+		  	if(this.oneUp && Q.state.get("score") / 1000 == this.lastMileStone){
+
+		  		this.extralife();
+		  		this.oneUp = false;
+		  	}
+		  	else if(!this.oneUp){
+		  		this.lastMileStone++;
+		  		this.oneUp = true;
+		  	}
+
 		  	if(this.p.y > 620){
 		  		this.fall();
 		  	}
@@ -139,6 +148,11 @@ var game = function() {
 		    	this.play("Stand_" + this.p.direction);
 		    }
 					
+		},
+		extralife: function(){
+
+			Q.state.inc("lives", 1);
+			Q.audio.play("1up.mp3");
 		}
 	
 	});
@@ -263,6 +277,39 @@ var game = function() {
 	
 	});
 
+	//SPRITE ONEUP
+	Q.Sprite.extend("OneUp",{
+
+	 
+		init: function(p) {
+
+			this.taken = false;
+		 
+		    this._super(p, {
+		    	asset: "1up_mushroom.png",
+		    	x: 2000,
+		    	y: 430,
+		    	vx: 100,
+		    	sensor: true
+		    });
+
+		    this.on("hit.sprite",function(collision) {
+
+
+				if(collision.obj.isA("Mario")) {
+					if(!this.taken){
+						this.taken = true;
+						collision.obj.extralife();
+						this.destroy();
+					}
+				}
+			});
+
+		}
+
+	
+	});
+
 ////////////////////////////////////COMPONENTES////////////////////////////////////////////////////
 	//COMPONENTE ENEMIGOS
 	Q.component("DefaultEnemy", {
@@ -350,13 +397,13 @@ var game = function() {
 ///////////////////////////////////AUDIOS///////////////////////////////////////////////////////////
 	//CARGA DE AUDIOS
 	Q.load(["music_die.mp3", "music_level_complete.mp3", "music_main.mp3",
-	 "coin.mp3", "mario-bros-mamma-mia.mp3", "squish_enemy.mp3", "kill_enemy.mp3", "metal_main.mp3"], function(){
+	 "coin.mp3", "mario-bros-mamma-mia.mp3", "squish_enemy.mp3", "kill_enemy.mp3", "1up.mp3"], function(){
 
 	});
 ///////////////////////////////////CARGA NIVELES////////////////////////////////////////////////////
 
 	//INICIALIZACION
-	Q.loadTMX("prueba3.tmx", function() {
+	Q.loadTMX("final.tmx", function() {
 		Q.stageScene("mainTitle");
 	});
 
@@ -374,25 +421,27 @@ var game = function() {
 	//NIVEL 1
 	Q.scene("level1", function(stage) {
 
-		Q.stageTMX("prueba3.tmx",stage);
+		Q.stageTMX("final.tmx",stage);
 
-		Q.audio.play('metal_main.mp3',{ loop: true });
+		Q.audio.play('music_main.mp3',{ loop: true });
+
 		var player = stage.insert(new Q.Mario({x: 150,y: 380,}));
-		/*stage.insert(new Q.Coin({x:400,y:420}));
-		stage.insert(new Q.Coin({x:430,y:420}));
-		stage.insert(new Q.Coin({x:460,y:420}));
-		stage.insert(new Q.Coin({x:500,y:420}));
-		stage.insert(new Q.Bloopa({x:595,y:420}));
-		stage.insert(new Q.Goomba({x: 600,y: 450}));
-		stage.insert(new Q.Goomba({x: 850,y: 450}));
-		stage.insert(new Q.Bloopa({x:1000,y:420}));
-		stage.insert(new Q.Bloopa({x:1160,y:420}));
-		stage.insert(new Q.Bloopa({x:1300,y:45}));
-		stage.insert(new Q.Goomba({x: 1450,y: 450}));
-		stage.insert(new Q.Goomba({x: 1500,y: 450}));
-		stage.insert(new Q.Coin({x:1500,y:480}));
-		stage.insert(new Q.Coin({x:1530,y:480}));*/
-		stage.insert(new Q.Peach({x: 4950,y: 350}));
+		
+		stage.insert(new Q.Goomba({x: 1460,y: 350}));
+		stage.insert(new Q.Goomba({x: 1475,y: 340}));
+
+		stage.insert(new Q.Peach({x: 2000,y: 517}));
+
+		stage.insert(new Q.Bloopa({x:752,y:420}));
+		stage.insert(new Q.Bloopa({x:652,y:420}));
+	
+		stage.insert(new Q.OneUp({x: 26,y: 528}));
+
+		stage.insert(new Q.Coin({x:500,y:464}));
+		stage.insert(new Q.Coin({x:532,y:464}));
+		stage.insert(new Q.Coin({x:500,y:432}));
+		stage.insert(new Q.Coin({x:532,y:432}));
+
 		stage.add("viewport").follow(Q("Mario").first());
 		stage.viewport.offsetX = -100;
 		stage.viewport.offsetY = 160;
@@ -419,7 +468,7 @@ var game = function() {
 	//GAME OVER
 	Q.scene('endGame',function(stage) {
 
-		Q.audio.stop("metal_main.mp3");	
+		Q.audio.stop("music_main.mp3");	
 		var container = stage.insert(new Q.UI.Container({
 		
 			x: Q.width/2, 
