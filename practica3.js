@@ -31,7 +31,7 @@ var game = function() {
 		Q.compileSheets("bloopa.png", "bloopa.json");
 		Q.compileSheets("coin.png", "coin.json");
 
-	});
+	
 
 	//SPRITE MARIO
 	Q.Sprite.extend("Mario",{
@@ -404,16 +404,6 @@ var game = function() {
 		Q.stageScene("mainTitle");
 	});
 
-	/*Q.loadTMX("prueba.tmx", function() {
-		Q.stageScene("mainTitle");
-	});
-
-	Q.loadTMX("level.tmx", function() {
-		Q.stageScene("mainTitle");
-	});*/
-
-
-
 
 	//NIVEL 1
 	Q.scene("level1", function(stage) {
@@ -501,7 +491,7 @@ var game = function() {
 		// (with a padding of 20 pixels)
 		container.fit(20);
 	});
-
+});
 	//HUD
     Q.scene("hud", function(stage) {
         /** Primero, voy a crear un "Container" que contendrá los labels. */
