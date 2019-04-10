@@ -1,0 +1,6 @@
+{
+	"bowserR":{"sx":0,"sy":0,"tileW":41,"tileH":64,"frames":6},
+	"bowserL":{"sx":0,"sy":0,"tileW":41,"tileH":64,"frames":6},
+	"bowserDie":{"sx":384,"sy":0,"tileW":32,"tileH":32,"frames":1},
+	"bowserJump":{"sx":128,"sy":0,"tileW":32,"tileH":32,"frames":1}
+}
